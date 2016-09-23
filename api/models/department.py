@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class Department(models.Model):
-    name = models.CharField(_('name'))
+    name = models.CharField(_('name'), max_length=255)
     desc = models.TextField(_('description'), default='')
     rating = models.IntegerField(default=0)
     avatar = models.FileField(
