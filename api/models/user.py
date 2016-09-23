@@ -26,11 +26,16 @@ class User(UserModel):
     level = models.ForeignKey(Level, related_name='users')
     balance = models.IntegerField(_('balance'), default=0)
     rating = models.IntegerField(_('rating'), default=0)
-
     phone = models.CharField(_('phone'), null=True)
     avatar = models.FileField(_('avatar'), upload_to='uploads/users/')
 
-    tasks = models.ManyToManyField(Task, null=True, related_name='users')
+    tasks = models.ManyToManyField(
+        Task,
+        null=True,
+        related_name='users',
+        through='TaskUserStatus',
+        through_fields=('user', 'task')
+    )
     achievements = models.ManyToManyField(
         Achievement,
         null=True,
@@ -38,3 +43,7 @@ class User(UserModel):
     )
 
 
+class TaskUserStatus(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    complete_count = models.IntegerField(default=0)
