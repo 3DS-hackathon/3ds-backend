@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from .task import Task
 from .request import Request
+from .user import Task
 
 
 class BalanceLog(models.Model):
