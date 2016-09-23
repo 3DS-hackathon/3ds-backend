@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User as UserModel
 from django.utils.translation import ugettext_lazy as _
 
-from .task import Task
 from .department import Department
 from .achievement import Achievement
 from .level import Level
@@ -30,10 +29,10 @@ class User(UserModel):
     avatar = models.FileField(_('avatar'), upload_to='uploads/users/')
 
     tasks = models.ManyToManyField(
-        Task,
+        'Task',
         null=True,
         related_name='users',
-        through='TaskUserStatus',
+        through='TaskStatus',
         through_fields=('user', 'task')
     )
     achievements = models.ManyToManyField(
@@ -43,7 +42,22 @@ class User(UserModel):
     )
 
 
-class TaskUserStatus(models.Model):
+class Task(models.Model):
+    TASK_TYPES = ((0, 'count'), (1, 'task'))
+
+    name = models.CharField(_('name'))
+    desc = models.TextField(_('description'), default='')
+    type = models.SmallIntegerField(
+        _('type'),
+        choices=TASK_TYPES,
+        default=TASK_TYPES[0][0]
+    )
+
+    total_count = models.IntegerField(default=0)
+    achievements = models.ManyToManyField(Achievement, related_name='tasks')
+
+
+class TaskStatus(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    complete_count = models.IntegerField(default=0)
+    progress = models.IntegerField(default=0)
