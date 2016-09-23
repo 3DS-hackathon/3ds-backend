@@ -1,11 +1,17 @@
+from abc import ABCMeta
 from rest_framework import serializers
 from api.models import *
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
+class BaseSerializer(metaclass=ABCMeta):
+    class Meta(metaclass=ABCMeta):
         depth = 1
+        fields = '__all__'
+
+
+class UserSerializer(BaseSerializer):
+    class Meta(BaseSerializer.Meta):
+        model = User
         fields = (
             'id',
             'email',
@@ -21,10 +27,9 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class LevelSerializer(serializers.ModelSerializer):
-    class Meta:
+class LevelSerializer(BaseSerializer):
+    class Meta(BaseSerializer.Meta):
         model = Level
-        fields = '__all__'
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -33,7 +38,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class TaskSerializer(BaseSerializer):
     progress = serializers.SerializerMethodField()
     user_progress = serializers.SerializerMethodField()
 
@@ -43,14 +48,27 @@ class TaskSerializer(serializers.ModelSerializer):
     def get_user_progress(self, obj):
         pass
 
-    class Meta:
+    class Meta(BaseSerializer.Meta):
         model = Task
-        depth = 1
-        fields = ('id', 'name', 'desc', 'type', 'total_count', )
+        fields = ('id', 'name', 'desc', 'type', 'total_count', 'requests')
 
 
-class RequestSerializer(serializers.ModelSerializer):
-    class Meta:
+class RequestSerializer(BaseSerializer):
+    class Meta(BaseSerializer.Meta):
         model = Request
-        depth = 1
-        fields = '__all__'
+
+
+class AchievementSerializer(BaseSerializer):
+    class Meta(BaseSerializer.Meta):
+        model = Achievement
+        fields = ('name', 'desc', 'pic', 'users', 'tasks')
+
+
+class AttachmentSerializer(BaseSerializer):
+    class Meta(BaseSerializer.Meta):
+        model = Attachment
+
+
+class BalanceLogSerializer(BaseSerializer):
+    class Meta(BaseSerializer.Meta):
+        model = BalanceLog

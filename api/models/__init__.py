@@ -1,4 +1,4 @@
-from .user import User, Task
+from .user import User, Task, TaskStatus
 from .achievement import Achievement
 from .level import Level
 from .department import Department
