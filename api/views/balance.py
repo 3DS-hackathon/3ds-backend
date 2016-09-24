@@ -9,8 +9,12 @@ class UserBalanceLogList(generics.ListAPIView):
 
     def filter_queryset(self, queryset):
         req = self.request
-        user = User.objects.filter(id=req.GET.get('id')).first() or req.user
 
-        if not user:
+        try:
+            user = User.objects.get(id=req.GET['id'])
+        except KeyError:
+            user = req.user
+        except User.DoesNotExist:
             return queryset.none()
-        return queryset.filter(task__in=(user.tasks.filter()))
+
+        return queryset.filter(request__task__in=(user.tasks.all()))

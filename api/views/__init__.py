@@ -1,5 +1,5 @@
 from .auth import ObtainTokenView
-from .users import UserView, TaskList, TaskAcceptor
+from .users import UserView, TaskList, TaskAcceptor, UserTaskList
 from .department import DepartmentView
 from .balance import UserBalanceLogList
 from .achievements import UserAchievementsList

@@ -44,6 +44,7 @@ class UserSerializer(BaseSerializer):
 
 class DepartmentSerializer(serializers.ModelSerializer):
     avatar = fields.FileField(read_only=True, use_url=True)
+    users = UserSerializer(many=True)
 
     class Meta:
         model = Department
@@ -54,7 +55,7 @@ class TaskSerializer(BaseSerializer):
     class Meta(BaseSerializer.Meta):
         model = Task
         fields = ('id', 'name', 'desc', 'type', 'total_count',
-                  'experience', 'price')
+                  'experience', 'price', 'achievements')
 
 
 class AttachmentSerializer(BaseSerializer):
@@ -118,7 +119,7 @@ class AchievementSerializer(BaseSerializer):
 
     class Meta(BaseSerializer.Meta):
         model = Achievement
-        fields = ('id', 'name', 'desc', 'pic', 'users', 'tasks')
+        fields = ('id', 'name', 'desc', 'pic')
 
 
 class BalanceLogSerializer(BaseSerializer):

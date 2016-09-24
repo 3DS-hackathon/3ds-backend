@@ -30,10 +30,9 @@ class TaskAcceptor(views.APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UserTaskList(TaskList):
+class UserTaskList(generics.ListAPIView):
+    serializer_class = TaskSerializer
 
-    def filter_queryset(self, queryset):
-        user = self.request.user
-        if not user:
-            return queryset.none()
-        return queryset.filter(task_status__user=user)
+    def get_queryset(self):
+        return self.request.user.tasks.all()
+
