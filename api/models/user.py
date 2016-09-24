@@ -112,6 +112,8 @@ class Task(models.Model):
     )
 
     total_count = models.IntegerField(default=0)
+    experience = models.IntegerField(default=0)
+    price = models.IntegerField(default=0)
     achievements = models.ManyToManyField(Achievement, related_name='tasks')
     pic = models.FileField('uploads/tasks/')
 

@@ -48,7 +48,8 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class TaskSerializer(BaseSerializer):
     class Meta(BaseSerializer.Meta):
         model = Task
-        fields = ('id', 'name', 'desc', 'type', 'total_count', 'requests')
+        fields = ('id', 'name', 'desc', 'type', 'total_count',
+                  'experience', 'price', 'requests')
 
 
 class TaskStatusSerializer(BaseSerializer):
