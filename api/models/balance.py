@@ -23,3 +23,6 @@ class BalanceLog(models.Model):
     @classmethod
     def remove(cls, request):
         cls.objects.get(request=request).delete()
+
+    def __str__(self):
+        return 'Balance log for (%s)' % str(self.request)

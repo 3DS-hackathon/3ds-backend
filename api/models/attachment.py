@@ -19,3 +19,6 @@ class Attachment(models.Model):
         non_strict, _ = mimetypes.guess_type(self.path.name, strict=False)
         self.mime_type = non_strict
         super().save(**kwargs)
+
+    def __str__(self):
+        return self.path.name

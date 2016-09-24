@@ -11,3 +11,6 @@ class Department(models.Model):
         null=True,
         upload_to='upload/depts/%Y/%m/%d/'
     )
+
+    def __str__(self):
+        return self.name

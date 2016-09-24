@@ -41,3 +41,8 @@ class Request(models.Model):
     def __decline(self):
         BalanceLog.remove(self)
         TaskStatus.remove_done_timestamp(self.user, self.task)
+
+    def __str__(self):
+        return '%s of %s - %s' % (self.task.name,
+                                  self.user.full_name,
+                                  self.status)

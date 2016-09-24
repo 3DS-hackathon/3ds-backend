@@ -155,6 +155,10 @@ class TaskStatus(models.Model):
     done_timestamp = models.DateField(null=True)
     progress = models.IntegerField(default=0)
 
+    class Meta:
+        verbose_name = 'Task status'
+        verbose_name_plural = 'Statuses of tasks'
+
     @classmethod
     def create(cls, user, task):
         return TaskStatus.objects.get_or_create(user=user, task=task)
