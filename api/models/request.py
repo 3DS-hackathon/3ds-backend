@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from .user import Task, User
+from .balance import BalanceLog
 
 
 class Request(models.Model):
@@ -9,7 +10,7 @@ class Request(models.Model):
         ('approved', 'Approved'),
         ('declined', 'Declined')
     )
-    REQUEST_TYPES = (('sell', 'Sell'), ('task', 'Task'))
+    REQUEST_TYPES = (('task', 'Task'),)
 
     status = models.CharField(
         _('status'),
@@ -17,11 +18,28 @@ class Request(models.Model):
         choices=REQUEST_STATUSES,
         default=REQUEST_STATUSES[0][0]
     )
-    type = models.CharField(
-        _('type'),
-        max_length=20,
-        choices=REQUEST_TYPES
-    )
     user = models.ForeignKey(User, related_name='requests')
     task = models.ForeignKey(Task, null=True, on_delete=models.SET_NULL,
                              related_name='requests')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__initial_status = self.status
+
+    def save(self, **kwargs):
+        if self.status != self.__initial_status:
+            if self.status == self.REQUEST_STATUSES[1][0]:
+                self.approve()
+            elif self.status == self.REQUEST_STATUSES[2][0]:
+                self.decline()
+        super().save(**kwargs)
+
+    def approve(self):
+        BalanceLog.create(self)
+
+    def decline(self):
+        BalanceLog.remove(self)
+
+
+
+

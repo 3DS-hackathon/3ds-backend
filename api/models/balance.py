@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from .request import Request
 
 
 class BalanceLog(models.Model):
@@ -10,7 +9,7 @@ class BalanceLog(models.Model):
     action = models.SmallIntegerField(_('action'), choices=ACTION_TYPES)
     delta_count = models.IntegerField(_('delta count'))
 
-    request = models.ForeignKey(Request, on_delete=models.CASCADE)
+    request = models.ForeignKey('api.Request', on_delete=models.CASCADE)
 
     @classmethod
     def create(cls, request, action='income', desc=None):
@@ -20,3 +19,7 @@ class BalanceLog(models.Model):
             delta_count=request.task.price,
             request=request
         )
+
+    @classmethod
+    def remove(cls, request):
+        cls.objects.get(request=request).delete()

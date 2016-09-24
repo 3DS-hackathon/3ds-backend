@@ -19,7 +19,10 @@ class LevelSerializer(BaseSerializer):
 class UserSerializer(BaseSerializer):
     level = LevelSerializer(source='get_level')
     avatar = fields.FileField(read_only=True, use_url=True)
-    balance = fields.ReadOnlyField()
+    balance = serializers.SerializerMethodField()
+
+    def get_balance(self, obj):
+        return obj.get_balance()
 
     class Meta(BaseSerializer.Meta):
         model = User
@@ -73,6 +76,10 @@ class AttachmentSerializer(BaseSerializer):
 
 class RequestSerializer(BaseSerializer):
     attachments = AttachmentSerializer(many=True)
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, obj):
+        return obj.task.type
 
     class Meta(BaseSerializer.Meta):
         model = Request
@@ -81,7 +88,6 @@ class RequestSerializer(BaseSerializer):
 
 class TaskRequestSerializer(serializers.Serializer):
     task_id = serializers.PrimaryKeyRelatedField(queryset=Task.objects.all())
-    type = serializers.ChoiceField(choices=Request.REQUEST_TYPES)
     user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     attachments = serializers.PrimaryKeyRelatedField(
         queryset=Attachment.objects.all(), many=True

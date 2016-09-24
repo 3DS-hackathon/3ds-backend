@@ -1,6 +1,6 @@
 from rest_framework import views, status
 from rest_framework.response import Response
-from api.serializers import TaskRequestSerializer, RequestSerializer, UserSerializer
+from api.serializers import TaskRequestSerializer, RequestSerializer
 
 
 class RequestCreator(views.APIView):
