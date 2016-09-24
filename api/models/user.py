@@ -76,7 +76,7 @@ class User(AbstractBaseUser):
             or 0
 
     phone = models.CharField(_('phone'), null=True, max_length=255)
-    avatar = models.FileField(_('avatar'), upload_to='uploads/users/')
+    avatar = models.FileField(_('avatar'), upload_to='upload/users/%Y/%m/%d/')
 
     achievements = models.ManyToManyField(
         Achievement,
