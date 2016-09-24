@@ -85,7 +85,8 @@ class TaskAdmin(admin.ModelAdmin):
     inlines = [TaskStatusInline]
     fieldsets = [
         (None, {'fields': ('name', 'desc', 'type')}),
-        ('Other', {'fields': ('total_count', 'experience', 'price', 'achievements', 'pic')})
+        ('Other', {'fields': ('total_count', 'experience', 'price', 'achievements', 'pic')}),
+        ('Timestamps', {'fields': ('start_timestamp', 'end_timestamp')})
     ]
 
 

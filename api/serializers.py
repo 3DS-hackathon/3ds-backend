@@ -1,8 +1,17 @@
 import os.path
+import datetime
 from abc import ABCMeta
 from rest_framework import serializers
 from rest_framework import fields
 from api.models import *
+
+
+class TimestampField(serializers.Field):
+    def to_representation(self, value):
+        return int(value.timestamp())
+
+    def to_internal_value(self, data):
+        return datetime.datetime.fromtimestamp(data)
 
 
 class BaseSerializer(serializers.ModelSerializer):
@@ -52,10 +61,14 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(BaseSerializer):
+    start_timestamp = TimestampField()
+    end_timestamp = TimestampField()
+
     class Meta(BaseSerializer.Meta):
         model = Task
         fields = ('id', 'name', 'desc', 'type', 'total_count',
-                  'experience', 'price', 'achievements')
+                  'experience', 'price', 'start_timestamp',
+                  'end_timestamp', 'achievements')
 
 
 class AttachmentSerializer(BaseSerializer):
@@ -115,7 +128,6 @@ class TaskRequestSerializer(serializers.Serializer):
         for key in ('task_id', 'user_id'):
             validated_data[key] = validated_data.pop(key).id
         return attach_ids
-
 
 
 class AchievementSerializer(BaseSerializer):

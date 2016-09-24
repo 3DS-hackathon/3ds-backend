@@ -142,6 +142,10 @@ class Task(models.Model):
     total_count = models.IntegerField(default=0)
     experience = models.IntegerField(default=0)
     price = models.IntegerField(default=0)
+
+    start_timestamp = models.DateTimeField(null=True)
+    end_timestamp = models.DateTimeField(null=True)
+
     achievements = models.ManyToManyField(Achievement, related_name='tasks')
     pic = models.FileField('upload/tasks/%Y/%m/%d/')
 
