@@ -5,12 +5,10 @@ from api.serializers import AttachmentSerializer
 
 
 class AttachmentCreator(views.APIView):
-    serializer_class = AttachmentSerializer
     parser_classes = (FileUploadParser,)
 
-    def post(self, request, filename, format=None):
-        serializer = AttachmentSerializer(
-            data={'path': request.data['file']}
-        )
+    def post(self, request, format=None):
+        serializer = AttachmentSerializer(data={'path': request.data['file']})
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)

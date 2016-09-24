@@ -1,10 +1,12 @@
-from mimetypes import MimeTypes
+import mimetypes
 from django.db import models
 from .request import Request
 
+mimetypes.init()
+
 
 class Attachment(models.Model):
-    path = models.FileField(upload_to='uploads/attachments/')
+    path = models.FileField(upload_to='upload/attachments/%Y/%m/%d/')
     mime_type = models.CharField(null=True, max_length=255)
     request = models.ForeignKey(
         Request,
@@ -14,10 +16,6 @@ class Attachment(models.Model):
     )
 
     def save(self, **kwargs):
-        types = MimeTypes()
-        types.readfp(self.path)
-
-        type_map = types.types_map[0]
-        if type_map:
-            self.mime_type = type_map.popitem()[1]
+        non_strict, _ = mimetypes.guess_type(self.path.name, strict=False)
+        self.mime_type = non_strict
         super().save(**kwargs)

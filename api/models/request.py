@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from .user import Task
+from .user import Task, User
 
 
 class Request(models.Model):
@@ -11,7 +11,6 @@ class Request(models.Model):
     )
     REQUEST_TYPES = (('sell', 'Sell'), ('task', 'Task'))
 
-    delta_balance = models.IntegerField(_('balance delta'))
     status = models.CharField(
         _('status'),
         max_length=20,
@@ -21,12 +20,8 @@ class Request(models.Model):
     type = models.CharField(
         _('type'),
         max_length=20,
-        choices=REQUEST_TYPES,
-        default=REQUEST_TYPES[0][0]
+        choices=REQUEST_TYPES
     )
-    task = models.ForeignKey(
-        Task,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='requests'
-    )
+    user = models.ForeignKey(User, related_name='requests')
+    task = models.ForeignKey(Task, null=True, on_delete=models.SET_NULL,
+                             related_name='requests')

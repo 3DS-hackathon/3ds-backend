@@ -19,6 +19,7 @@ class LevelSerializer(BaseSerializer):
 class UserSerializer(BaseSerializer):
     level = LevelSerializer(source='get_level')
     avatar = fields.FileField(read_only=True, use_url=True)
+    balance = fields.ReadOnlyField()
 
     class Meta(BaseSerializer.Meta):
         model = User
@@ -73,15 +74,32 @@ class AttachmentSerializer(BaseSerializer):
 class RequestSerializer(BaseSerializer):
     attachments = AttachmentSerializer(many=True)
 
+    class Meta(BaseSerializer.Meta):
+        model = Request
+        fields = ('id', 'status', 'type', 'task', 'attachments')
+
+
+class TaskRequestSerializer(serializers.Serializer):
+    task_id = serializers.PrimaryKeyRelatedField(queryset=Task.objects.all())
+    type = serializers.ChoiceField(choices=Request.REQUEST_TYPES)
+    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    attachments = serializers.PrimaryKeyRelatedField(
+        queryset=Attachment.objects.all(), many=True
+    )
+
     def create(self, validated_data):
+        attach_ids = map(lambda a: a.id, validated_data.pop('attachments'))
+        validated_data['task_id'] = validated_data.pop('task_id').id
+        validated_data['user_id'] = validated_data.pop('user_id').id
         request_ = Request.objects.create(**validated_data)
-        attach_ids = validated_data.pop('attachments', [])
         self._update_attachments(attach_ids, request_)
         request_.save()
         return request_
 
     def update(self, instance, validated_data):
-        attach_ids = validated_data.pop('attachments', [])
+        attach_ids = map(lambda a: a.id, validated_data.pop('attachments'))
+        validated_data['task_id'] = validated_data.pop('task_id').id
+        validated_data['user_id'] = validated_data.pop('user_id').id
         self._update_attachments(attach_ids, instance)
         instance.save(**validated_data)
         return instance
@@ -92,11 +110,6 @@ class RequestSerializer(BaseSerializer):
         for model in attach_models:
             model.request = request_
             model.save()
-
-    class Meta(BaseSerializer.Meta):
-        model = Request
-        fields = ('id', 'data_balance', 'status',
-                  'type', 'task', 'attachments')
 
 
 class AchievementSerializer(BaseSerializer):

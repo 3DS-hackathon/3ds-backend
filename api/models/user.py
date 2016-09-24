@@ -55,7 +55,13 @@ class User(AbstractBaseUser):
         related_name='users'
     )
 
-    balance = models.IntegerField(_('balance'), default=0)
+    tasks = models.ManyToManyField(
+        'Task',
+        related_name='users',
+        through='TaskStatus',
+        through_fields=('user', 'task')
+    )
+
     rating = models.IntegerField(_('rating'), default=0)
     phone = models.CharField(_('phone'), null=True, max_length=255)
     avatar = models.FileField(_('avatar'), upload_to='uploads/users/')
@@ -76,8 +82,18 @@ class User(AbstractBaseUser):
             .filter(start_count__gte=self.rating) \
             .order_by('start_count').first()
 
-    def get_full_name(self):
-        return self.full_name
+    def get_balance(self):
+        from .balance import BalanceLog
+
+        log = BalanceLog.objects.filter(request__user=self)
+        income = log.filter(action=BalanceLog.ACTION_TYPES[0][0]).aggregate(
+            models.Sum('delta_count')
+        )['delta_count__sum'] or 0
+        outcome = log.filter(action=BalanceLog.ACTION_TYPES[1][0]).aggregate(
+            models.Sum('delta_count')
+        )['delta_count__sum'] or 0
+
+        return income - outcome
 
     def has_perm(self, perm, obj=None):
         return True
@@ -115,11 +131,10 @@ class Task(models.Model):
     experience = models.IntegerField(default=0)
     price = models.IntegerField(default=0)
     achievements = models.ManyToManyField(Achievement, related_name='tasks')
-    pic = models.FileField('uploads/tasks/')
+    pic = models.FileField('upload/tasks/%Y/%m/%d/')
 
 
 class TaskStatus(models.Model):
-    user = models.ForeignKey(User, related_name='tasks',
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     progress = models.IntegerField(default=0)

@@ -9,5 +9,5 @@ class Department(models.Model):
     avatar = models.FileField(
         _('avatar'),
         null=True,
-        upload_to='uploads/depts/'
+        upload_to='upload/depts/%Y/%m/%d/'
     )
