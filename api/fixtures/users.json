@@ -1,0 +1,19 @@
+[
+  {
+    "model": "api.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$30000$dyiuygwrVu7H$o6/x9eFqwpxxQdjSCRwjJ/m7ZglS/D2zjzsaP6uUYX0=",
+      "last_login": "2016-09-24T00:53:55.897Z",
+      "email": "vertuhai@rt.ru",
+      "full_name": "",
+      "role": "vertuhai",
+      "department": null,
+      "balance": 0,
+      "rating": 0,
+      "phone": null,
+      "avatar": "",
+      "achievements": []
+    }
+  }
+]

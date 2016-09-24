@@ -4,8 +4,8 @@ from .user import Task
 
 
 class Request(models.Model):
-    REQUEST_STATUSES = ((0, 'pending'), (1, 'approved'), (2, 'declined'))
-    REQUEST_TYPES = ((0, 'sell'), (1, 'task'))
+    REQUEST_STATUSES = ((0, 'Pending'), (1, 'Approved'), (2, 'Declined'))
+    REQUEST_TYPES = ((0, 'Sell'), (1, 'Task'))
 
     delta_balance = models.IntegerField(_('balance delta'))
     status = models.SmallIntegerField(

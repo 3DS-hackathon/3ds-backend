@@ -1,0 +1,52 @@
+[
+  {
+    "model": "api.Level",
+    "pk": 1,
+    "fields": {
+      "level": 1,
+      "name": "Level 1",
+      "start_count": 0,
+      "end_count": 10
+    }
+  },
+  {
+    "model": "api.Level",
+    "pk": 2,
+    "fields": {
+      "level": 2,
+      "name": "Level 2",
+      "start_count": 10,
+      "end_count": 20
+    }
+  },
+  {
+    "model": "api.Level",
+    "pk": 3,
+    "fields": {
+      "level": 3,
+      "name": "Level 3",
+      "start_count": 20,
+      "end_count": 30
+    }
+  },
+  {
+    "model": "api.Level",
+    "pk": 4,
+    "fields": {
+      "level": 4,
+      "name": "Level 4",
+      "start_count": 30,
+      "end_count": 40
+    }
+  },
+  {
+    "model": "api.Level",
+    "pk": 5,
+    "fields": {
+      "level": 5,
+      "name": "Level 5",
+      "start_count": 40,
+      "end_count": 50
+    }
+  }
+]

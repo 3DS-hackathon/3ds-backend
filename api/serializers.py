@@ -3,13 +3,20 @@ from rest_framework import serializers
 from api.models import *
 
 
-class BaseSerializer(metaclass=ABCMeta):
+class BaseSerializer(serializers.ModelSerializer):
     class Meta(metaclass=ABCMeta):
         depth = 1
         fields = '__all__'
 
 
+class LevelSerializer(BaseSerializer):
+    class Meta(BaseSerializer.Meta):
+        model = Level
+
+
 class UserSerializer(BaseSerializer):
+    level = LevelSerializer(source="get_level")
+
     class Meta(BaseSerializer.Meta):
         model = User
         fields = (
@@ -17,19 +24,14 @@ class UserSerializer(BaseSerializer):
             'email',
             'role',
             'department',
-            'level',
             'balance',
             'rating',
             'phone',
             'avatar',
             'tasks',
+            'level',
             'achievements',
         )
-
-
-class LevelSerializer(BaseSerializer):
-    class Meta(BaseSerializer.Meta):
-        model = Level
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -39,14 +41,14 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(BaseSerializer):
-    progress = serializers.SerializerMethodField()
-    user_progress = serializers.SerializerMethodField()
-
-    def get_progress(self, obj):
-        pass
-
-    def get_user_progress(self, obj):
-        pass
+    # progress = serializers.SerializerMethodField()
+    # user_progress = serializers.SerializerMethodField()
+    #
+    # def get_progress(self, obj):
+    #     pass
+    #
+    # def get_user_progress(self, obj):
+    #     pass
 
     class Meta(BaseSerializer.Meta):
         model = Task

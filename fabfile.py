@@ -4,6 +4,7 @@ from fabric.contrib import files
 from fabric.context_managers import cd, lcd, shell_env
 import tarfile
 
+env.shell = "/bin/bash -l -c"
 env.build_dir = os.getenv("FABFILE_DIR", os.path.dirname(os.path.abspath(__file__)))
 env.build_venv_path = os.getenv("BUILD_VENV", os.path.join(env.build_dir, "env"))
 env.build_venv_name = os.getenv("BUILD_VENV_NAME", "")
@@ -14,12 +15,12 @@ env.deploy_to = os.getenv("DEPLOY_NAME", "prod")
 
 
 def activate():
-    return prefix("source %s" % os.path.join(env.build_venv_path, env.build_venv_name,
+    return prefix(". %s" % os.path.join(env.build_venv_path, env.build_venv_name,
                                              "bin", "activate"))
 
 
 def remote_activate():
-    return prefix("source %s" % os.path.join(env.deploy_venv, "bin", "activate"))
+    return prefix(". %s" % os.path.join(env.deploy_venv, "bin", "activate"))
 
 
 def lmanage(postfix):
@@ -114,6 +115,8 @@ def migrate():
         with cd(os.path.join(env.deploy_dir, "current")):
             with prefix("export DJANGO_SETTINGS_MODULE=up3ds.settings_%s" % env.deploy_to):
                 run("python manage.py migrate")
+                run("python manage.py loaddata levels")
+                run("python manage.py loaddata users")
 
 
 def deploy():

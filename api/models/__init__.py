@@ -1,6 +1,5 @@
-from .user import User, Task, TaskStatus
+from .user import User, Task, TaskStatus, Level
 from .achievement import Achievement
-from .level import Level
 from .department import Department
 from .request import Request
 from .balance import BalanceLog
