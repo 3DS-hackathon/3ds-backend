@@ -6,3 +6,6 @@ class Achievement(models.Model):
     name = models.CharField(_('name'), max_length=255)
     desc = models.TextField(_('description'))
     pic = models.FileField(upload_to='upload/achievements/%Y/%m/%d/')
+
+    def __str__(self):
+        return self.name

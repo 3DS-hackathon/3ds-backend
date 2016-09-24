@@ -5,7 +5,7 @@ from .views import *
 
 urlpatterns = format_suffix_patterns([
     url(r'login$', ObtainTokenView.as_view()),
-
+    url(r'task$', TaskAcceptor.as_view()),
     url(r'attach$', AttachmentCreator.as_view()),
     url(r'request$', RequestCreator.as_view()),
 

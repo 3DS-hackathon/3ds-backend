@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from .user import Task, User
+from .user import Task, User, TaskStatus
 from .balance import BalanceLog
 
 
@@ -29,17 +29,15 @@ class Request(models.Model):
     def save(self, **kwargs):
         if self.status != self.__initial_status:
             if self.status == self.REQUEST_STATUSES[1][0]:
-                self.approve()
+                self.__approve()
             elif self.status == self.REQUEST_STATUSES[2][0]:
-                self.decline()
+                self.__decline()
         super().save(**kwargs)
 
-    def approve(self):
+    def __approve(self):
         BalanceLog.create(self)
+        TaskStatus.set_done_timestamp(self.user, self.task)
 
-    def decline(self):
+    def __decline(self):
         BalanceLog.remove(self)
-
-
-
-
+        TaskStatus.remove_done_timestamp(self.user, self.task)

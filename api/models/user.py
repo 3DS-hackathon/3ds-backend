@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager
@@ -41,7 +42,7 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     email = models.CharField(max_length=255, unique=True, db_index=True)
-    full_name = models.CharField(max_length=255, default='')
+    full_name = models.CharField(max_length=255, default='Аноним')
     role = models.CharField(
         _('user role'),
         max_length=10,
@@ -62,7 +63,18 @@ class User(AbstractBaseUser):
         through_fields=('user', 'task')
     )
 
-    rating = models.IntegerField(_('rating'), default=0)
+    @property
+    def rating(self):
+        from .request import Request
+        start_day = datetime.date.today().replace(day=1)
+        tasks = Task.objects.filter(
+            requests__user=self,
+            requests__status=Request.REQUEST_STATUSES[1][0],
+            statuses__done_timestamp__gte=start_day
+        )
+        return tasks.aggregate(models.Sum('experience'))['experience__sum'] \
+            or 0
+
     phone = models.CharField(_('phone'), null=True, max_length=255)
     avatar = models.FileField(_('avatar'), upload_to='uploads/users/')
 
@@ -133,8 +145,33 @@ class Task(models.Model):
     achievements = models.ManyToManyField(Achievement, related_name='tasks')
     pic = models.FileField('upload/tasks/%Y/%m/%d/')
 
+    def __str__(self):
+        return self.name
+
 
 class TaskStatus(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='statuses')
+    done_timestamp = models.DateField(null=True)
     progress = models.IntegerField(default=0)
+
+    @classmethod
+    def create(cls, user, task):
+        return TaskStatus.objects.get_or_create(user=user, task=task)
+
+    @classmethod
+    def remove(cls, user, task):
+        TaskStatus.objects.get(user=user, task=task).delete()
+
+    @classmethod
+    def set_done_timestamp(cls, user, task):
+        status = cls.objects.get(user=user, task=task)
+        status.done_timestamp = datetime.date.today()
+        status.save()
+
+    @classmethod
+    def remove_done_timestamp(cls, user, task):
+        status = cls.objects.get(user=user, task=task)
+        status.done_timestamp = None
+        status.save()
+

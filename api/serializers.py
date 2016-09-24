@@ -29,6 +29,7 @@ class UserSerializer(BaseSerializer):
         fields = (
             'id',
             'email',
+            'full_name',
             'role',
             'department',
             'balance',
@@ -53,13 +54,7 @@ class TaskSerializer(BaseSerializer):
     class Meta(BaseSerializer.Meta):
         model = Task
         fields = ('id', 'name', 'desc', 'type', 'total_count',
-                  'experience', 'price', 'requests')
-
-
-class TaskStatusSerializer(BaseSerializer):
-    class Meta(BaseSerializer.Meta):
-        model = TaskStatus
-        exclude = ('user',)
+                  'experience', 'price')
 
 
 class AttachmentSerializer(BaseSerializer):

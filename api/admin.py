@@ -49,16 +49,21 @@ class UserChangeForm(forms.ModelForm):
         return self.initial['password']
 
 
+class TaskStatusInline(admin.TabularInline):
+    model = TaskStatus
+
+
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
 
     list_display = ('email', 'full_name')
     list_filter = ('role',)
+    inlines = [TaskStatusInline]
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Пользователь', {'fields': ('full_name', 'role', 'phone')}),
-        ('Общее', {'fields': ('department', 'balance', 'rating', 'avatar')}),
+        ('Общее', {'fields': ('department', 'avatar')}),
     )
     add_fieldsets = (
         (None, {
@@ -70,11 +75,25 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
     filter_horizontal = ()
 
+
+
+class UsersTabularInline(admin.TabularInline):
+    model = User
+
+
+class TaskAdmin(admin.ModelAdmin):
+    inlines = [TaskStatusInline]
+    fieldsets = [
+        (None, {'fields': ('name', 'desc', 'type')}),
+        ('Other', {'fields': ('total_count', 'experience', 'price', 'achievements', 'pic')})
+    ]
+
+
 admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
 
 admin.site.register(Achievement)
 admin.site.register(Request)
-admin.site.register(Task)
+admin.site.register(Task, TaskAdmin)
 admin.site.register(Level)
 admin.site.register(Department)
