@@ -76,11 +76,6 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 
-
-class UsersTabularInline(admin.TabularInline):
-    model = User
-
-
 class TaskAdmin(admin.ModelAdmin):
     inlines = [TaskStatusInline]
     fieldsets = [

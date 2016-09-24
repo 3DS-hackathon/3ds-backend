@@ -1,11 +1,11 @@
 from rest_framework import views, status
-from rest_framework.parsers import FileUploadParser
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from api.serializers import AttachmentSerializer
 
 
 class AttachmentCreator(views.APIView):
-    parser_classes = (FileUploadParser,)
+    parser_classes = (MultiPartParser,)
 
     def post(self, request, format=None):
         serializer = AttachmentSerializer(data={'path': request.data['file']})

@@ -133,3 +133,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+FILE_UPLOAD_MAX_MEMORY_SIZE = 8388608

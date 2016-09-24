@@ -63,12 +63,22 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class TaskSerializer(BaseSerializer):
     start_timestamp = TimestampField()
     end_timestamp = TimestampField()
+    progress = serializers.SerializerMethodField()
+
+    def get_progress(self, obj):
+        try:
+            user = self.context['request'].user
+            return TaskStatus.objects.get(user=user, task=obj).progress
+        except KeyError:
+            return None
+        except TaskStatus.DoesNotExist:
+            return None
 
     class Meta(BaseSerializer.Meta):
         model = Task
         fields = ('id', 'name', 'desc', 'type', 'total_count',
                   'experience', 'price', 'start_timestamp',
-                  'end_timestamp', 'achievements')
+                  'end_timestamp', 'progress', 'achievements')
 
 
 class AttachmentSerializer(BaseSerializer):

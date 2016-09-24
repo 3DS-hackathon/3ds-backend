@@ -156,7 +156,7 @@ class Task(models.Model):
 class TaskStatus(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='statuses')
-    done_timestamp = models.DateField(null=True)
+    done_timestamp = models.DateField(null=True, blank=True)
     progress = models.IntegerField(default=0)
 
     class Meta:
