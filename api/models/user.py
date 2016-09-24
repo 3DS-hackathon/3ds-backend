@@ -60,12 +60,6 @@ class User(AbstractBaseUser):
     phone = models.CharField(_('phone'), null=True, max_length=255)
     avatar = models.FileField(_('avatar'), upload_to='uploads/users/')
 
-    tasks = models.ManyToManyField(
-        'Task',
-        related_name='users',
-        through='TaskStatus',
-        through_fields=('user', 'task')
-    )
     achievements = models.ManyToManyField(
         Achievement,
         related_name='users'
@@ -119,9 +113,11 @@ class Task(models.Model):
 
     total_count = models.IntegerField(default=0)
     achievements = models.ManyToManyField(Achievement, related_name='tasks')
+    pic = models.FileField('uploads/tasks/')
 
 
 class TaskStatus(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='tasks',
+                             on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     progress = models.IntegerField(default=0)

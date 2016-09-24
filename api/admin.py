@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django import forms
 
-from api.models import User
+from api.models import *
 
 
 class UserCreationForm(forms.ModelForm):
@@ -41,7 +41,8 @@ class UserChangeForm(forms.ModelForm):
             'full_name',
             'role',
             'department',
-            'phone'
+            'phone',
+            'avatar'
         )
 
     def clean_password(self):
@@ -57,7 +58,7 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Пользователь', {'fields': ('full_name', 'role', 'phone')}),
-        ('Общее', {'fields': ('department', 'balance', 'rating')}),
+        ('Общее', {'fields': ('department', 'balance', 'rating', 'avatar')}),
     )
     add_fieldsets = (
         (None, {
@@ -71,3 +72,9 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
+
+admin.site.register(Achievement)
+admin.site.register(Request)
+admin.site.register(Task)
+admin.site.register(Level)
+admin.site.register(Department)
