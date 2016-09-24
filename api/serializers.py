@@ -90,18 +90,14 @@ class TaskRequestSerializer(serializers.Serializer):
     )
 
     def create(self, validated_data):
-        attach_ids = map(lambda a: a.id, validated_data.pop('attachments'))
-        validated_data['task_id'] = validated_data.pop('task_id').id
-        validated_data['user_id'] = validated_data.pop('user_id').id
+        attach_ids = self._normalize_validated_data(validated_data)
         request_ = Request.objects.create(**validated_data)
         self._update_attachments(attach_ids, request_)
         request_.save()
         return request_
 
     def update(self, instance, validated_data):
-        attach_ids = map(lambda a: a.id, validated_data.pop('attachments'))
-        validated_data['task_id'] = validated_data.pop('task_id').id
-        validated_data['user_id'] = validated_data.pop('user_id').id
+        attach_ids = self._normalize_validated_data(validated_data)
         self._update_attachments(attach_ids, instance)
         instance.save(**validated_data)
         return instance
@@ -112,6 +108,14 @@ class TaskRequestSerializer(serializers.Serializer):
         for model in attach_models:
             model.request = request_
             model.save()
+
+    @staticmethod
+    def _normalize_validated_data(validated_data):
+        attach_ids = map(lambda a: a.id, validated_data.pop('attachments'))
+        for key in ('task_id', 'user_id'):
+            validated_data[key] = validated_data.pop(key).id
+        return attach_ids
+
 
 
 class AchievementSerializer(BaseSerializer):

@@ -1,4 +1,5 @@
 from rest_framework import generics
+from api.models import User
 
 
 class RetrieveModelView(generics.RetrieveAPIView):
@@ -25,4 +26,16 @@ class RetrieveModelView(generics.RetrieveAPIView):
             return self.get_default_id()
         except:
             return -1
+
+
+class UserFilterListView(generics.ListAPIView):
+    def get_user(self):
+        req = self.request
+        try:
+            user = User.objects.get(id=req.GET['id'])
+        except KeyError:
+            user = req.user
+        except User.DoesNotExist:
+            return None
+        return user
 
