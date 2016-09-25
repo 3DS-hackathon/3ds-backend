@@ -85,7 +85,8 @@ class User(AbstractBaseUser):
             or 0
 
     phone = models.CharField(_('phone'), null=True, max_length=255)
-    avatar = models.FileField(_('avatar'), upload_to='upload/users/%Y/%m/%d/')
+    avatar = models.FileField(_('avatar'), upload_to='upload/users/%Y/%m/%d/',
+                              blank=True, null=True)
 
     def __str__(self):
         return '%s <%s>' % (self.full_name, self.email)
@@ -152,17 +153,27 @@ class Task(models.Model):
     end_timestamp = models.DateTimeField(null=True)
 
     achievements = models.ManyToManyField(Achievement, related_name='tasks')
-    pic = models.FileField('upload/tasks/%Y/%m/%d/')
+    pic = models.FileField('upload/tasks/%Y/%m/%d/', null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
 class TaskStatus(models.Model):
+    TASK_STATUSES = (('pending', 'Pending'),
+                     ('progress', 'Progress'),
+                     ('completed', 'Completed'))
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='statuses')
+    task = models.ForeignKey(Task, on_delete=models.CASCADE,
+                             related_name='statuses')
     done_timestamp = models.DateField(null=True, blank=True)
     progress = models.IntegerField(default=0)
+    status = models.CharField(
+        max_length=20,
+        choices=TASK_STATUSES,
+        default=TASK_STATUSES[1][0]
+    )
 
     class Meta:
         verbose_name = 'Task status'
@@ -170,21 +181,26 @@ class TaskStatus(models.Model):
 
     @classmethod
     def create(cls, user, task):
-        return TaskStatus.objects.get_or_create(user=user, task=task)
+        task_status = TaskStatus.objects.get_or_create(user=user, task=task)
+        task_status.status = 'progress'
+        task_status.save()
+        return task_status
 
     @classmethod
     def remove(cls, user, task):
         TaskStatus.objects.get(user=user, task=task).delete()
 
     @classmethod
-    def set_done_timestamp(cls, user, task):
-        status = cls.objects.get(user=user, task=task)
-        status.done_timestamp = datetime.date.today()
-        status.save()
+    def set_done(cls, user, task):
+        task_status = cls.objects.get(user=user, task=task)
+        task_status.done_timestamp = datetime.date.today()
+        task_status.status = 'completed'
+        task_status.save()
 
     @classmethod
-    def remove_done_timestamp(cls, user, task):
-        status = cls.objects.get(user=user, task=task)
-        status.done_timestamp = None
-        status.save()
+    def remove_done(cls, user, task):
+        task_status = cls.objects.get(user=user, task=task)
+        task_status.done_timestamp = None
+        task_status.status = 'pending'
+        task_status.save()
 

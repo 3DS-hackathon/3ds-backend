@@ -53,6 +53,10 @@ class TaskStatusInline(admin.TabularInline):
     model = TaskStatus
 
 
+class AchievementsInline(admin.TabularInline):
+    model = Achievement
+
+
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm

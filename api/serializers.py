@@ -38,6 +38,7 @@ class TaskSerializer(BaseSerializer):
     start_timestamp = TimestampField()
     end_timestamp = TimestampField()
     progress = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
     achievements = AchievementSerializer(many=True)
 
     def get_progress(self, obj):
@@ -49,10 +50,19 @@ class TaskSerializer(BaseSerializer):
         except TaskStatus.DoesNotExist:
             return None
 
+    def get_status(self, obj):
+        try:
+            user = self.context['request'].user
+            return TaskStatus.objects.get(user=user, task=obj).status
+        except KeyError:
+            return 'pending'
+        except TaskStatus.DoesNotExist:
+            return 'pending'
+
     class Meta(BaseSerializer.Meta):
         model = Task
         fields = ('id', 'name', 'desc', 'type', 'total_count',
-                  'experience', 'price', 'start_timestamp',
+                  'experience', 'price', 'start_timestamp', 'status',
                   'end_timestamp', 'progress', 'achievements')
 
 
@@ -68,29 +78,23 @@ class UserSerializer(BaseSerializer):
 
     class Meta(BaseSerializer.Meta):
         model = User
-        fields = (
-            'id',
-            'email',
-            'full_name',
-            'role',
-            'department',
-            'balance',
-            'rating',
-            'phone',
-            'avatar',
-            'tasks',
-            'level',
-            'achievements',
-        )
+        fields = ('id', 'email', 'full_name', 'role', 'balance', 'rating',
+                  'phone', 'avatar', 'tasks', 'level', 'achievements', 'department')
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
     avatar = fields.FileField(read_only=True, use_url=True)
+    rating = serializers.SerializerMethodField()
+    achievements = AchievementSerializer(many=True)
     users = UserSerializer(many=True)
 
-    class Meta:
+    def get_rating(self, obj):
+        return obj.rating
+
+    class Meta(BaseSerializer.Meta):
         model = Department
-        fields = ('id', 'name', 'desc', 'avatar', 'rating', 'users')
+        fields = ('id', 'name', 'desc', 'avatar',
+                  'rating', 'users', 'achievements')
 
 
 class AttachmentSerializer(BaseSerializer):

@@ -36,11 +36,11 @@ class Request(models.Model):
 
     def __approve(self):
         BalanceLog.create(self)
-        TaskStatus.set_done_timestamp(self.user, self.task)
+        TaskStatus.set_done(self.user, self.task)
 
     def __decline(self):
         BalanceLog.remove(self)
-        TaskStatus.remove_done_timestamp(self.user, self.task)
+        TaskStatus.remove_done(self.user, self.task)
 
     def __str__(self):
         return '%s of %s - %s' % (self.task.name,
