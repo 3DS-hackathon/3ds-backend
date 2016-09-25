@@ -1,6 +1,6 @@
-from api.models import Achievement, Request, Task
 from api.serializers import AchievementSerializer
 from .common import UserFilterListView
+from django.http import Http404
 
 
 class UserAchievementsList(UserFilterListView):
@@ -8,8 +8,6 @@ class UserAchievementsList(UserFilterListView):
 
     def get_queryset(self):
         user = self.get_user()
-        tasks = Task.objects.filter(
-            requests__user=user,
-            requests__status=Request.REQUEST_STATUSES[1][0]
-        )
-        return Achievement.objects.filter(tasks__in=tasks)
+        if user is None:
+            raise Http404
+        return user.achievements

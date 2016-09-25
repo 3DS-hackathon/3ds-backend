@@ -25,10 +25,43 @@ class LevelSerializer(BaseSerializer):
         model = Level
 
 
+class AchievementSerializer(BaseSerializer):
+    pic = fields.FileField(allow_empty_file=False, use_url=True)
+
+    class Meta(BaseSerializer.Meta):
+        model = Achievement
+        fields = ('id', 'name', 'desc', 'pic',
+                  'background_color', 'text_color')
+
+
+class TaskSerializer(BaseSerializer):
+    start_timestamp = TimestampField()
+    end_timestamp = TimestampField()
+    progress = serializers.SerializerMethodField()
+    achievements = AchievementSerializer(many=True)
+
+    def get_progress(self, obj):
+        try:
+            user = self.context['request'].user
+            return TaskStatus.objects.get(user=user, task=obj).progress
+        except KeyError:
+            return None
+        except TaskStatus.DoesNotExist:
+            return None
+
+    class Meta(BaseSerializer.Meta):
+        model = Task
+        fields = ('id', 'name', 'desc', 'type', 'total_count',
+                  'experience', 'price', 'start_timestamp',
+                  'end_timestamp', 'progress', 'achievements')
+
+
 class UserSerializer(BaseSerializer):
     level = LevelSerializer(source='get_level')
     avatar = fields.FileField(read_only=True, use_url=True)
     balance = serializers.SerializerMethodField()
+    tasks = TaskSerializer(many=True)
+    achievements = AchievementSerializer(many=True)
 
     def get_balance(self, obj):
         return obj.get_balance()
@@ -60,27 +93,6 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'desc', 'avatar', 'rating', 'users')
 
 
-class TaskSerializer(BaseSerializer):
-    start_timestamp = TimestampField()
-    end_timestamp = TimestampField()
-    progress = serializers.SerializerMethodField()
-
-    def get_progress(self, obj):
-        try:
-            user = self.context['request'].user
-            return TaskStatus.objects.get(user=user, task=obj).progress
-        except KeyError:
-            return None
-        except TaskStatus.DoesNotExist:
-            return None
-
-    class Meta(BaseSerializer.Meta):
-        model = Task
-        fields = ('id', 'name', 'desc', 'type', 'total_count',
-                  'experience', 'price', 'start_timestamp',
-                  'end_timestamp', 'progress', 'achievements')
-
-
 class AttachmentSerializer(BaseSerializer):
     path = fields.FileField(allow_empty_file=False, use_url=True)
     file_name = fields.SerializerMethodField(read_only=True)
@@ -96,6 +108,7 @@ class AttachmentSerializer(BaseSerializer):
 class RequestSerializer(BaseSerializer):
     attachments = AttachmentSerializer(many=True)
     type = serializers.SerializerMethodField()
+    task = TaskSerializer()
 
     def get_type(self, obj):
         return obj.task.type
@@ -138,14 +151,6 @@ class TaskRequestSerializer(serializers.Serializer):
         for key in ('task_id', 'user_id'):
             validated_data[key] = validated_data.pop(key).id
         return attach_ids
-
-
-class AchievementSerializer(BaseSerializer):
-    pic = fields.FileField(allow_empty_file=False, use_url=True)
-
-    class Meta(BaseSerializer.Meta):
-        model = Achievement
-        fields = ('id', 'name', 'desc', 'pic')
 
 
 class BalanceLogSerializer(BaseSerializer):

@@ -64,6 +64,15 @@ class User(AbstractBaseUser):
     )
 
     @property
+    def achievements(self):
+        from .request import Request
+        tasks = Task.objects.filter(
+            requests__user=self,
+            requests__status=Request.REQUEST_STATUSES[1][0]
+        )
+        return Achievement.objects.filter(tasks__in=tasks)
+
+    @property
     def rating(self):
         from .request import Request
         start_day = datetime.date.today().replace(day=1)
@@ -77,11 +86,6 @@ class User(AbstractBaseUser):
 
     phone = models.CharField(_('phone'), null=True, max_length=255)
     avatar = models.FileField(_('avatar'), upload_to='upload/users/%Y/%m/%d/')
-
-    achievements = models.ManyToManyField(
-        Achievement,
-        related_name='users'
-    )
 
     def __str__(self):
         return '%s <%s>' % (self.full_name, self.email)
@@ -129,12 +133,13 @@ class Level(models.Model):
 
 
 class Task(models.Model):
-    TASK_TYPES = ((0, 'count'), (1, 'task'))
+    TASK_TYPES = (('count', 'Count'), ('task', 'Task'))
 
     name = models.CharField(_('name'), max_length=255)
     desc = models.TextField(_('description'), default='')
-    type = models.SmallIntegerField(
+    type = models.CharField(
         _('type'),
+        max_length=10,
         choices=TASK_TYPES,
         default=TASK_TYPES[0][0]
     )

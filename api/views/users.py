@@ -22,7 +22,10 @@ class TaskList(generics.ListAPIView):
 class TaskAcceptor(views.APIView):
 
     def get(self, request, format=None):
-        task = Task.objects.get(id=request.GET.get('id'))
+        task = generics.get_object_or_404(
+            Task.objects.all(),
+            id=request.GET.get('id')
+        )
         user = request.user
         TaskStatus.create(user, task)
         serializer = TaskSerializer(instance=task)
